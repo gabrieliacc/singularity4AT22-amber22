@@ -1,0 +1,54 @@
+BootStrap: docker
+From: nvidia/cuda:11.7.0-devel-rockylinux8
+Stage: compile
+
+%files
+./Amber20.tar.bz2 /opt
+./AmberTools22.tar.bz2 /opt
+
+%post 
+dnf -y install tcsh make \
+               which flex bison patch bc \
+               libXt-devel libXext-devel \
+               perl util-linux wget bzip2 \
+               bzip2-devel zlib-devel \
+	       python38 python38-devel \
+	       fftw fftw-devel gcc-gfortran
+               #gcc gcc-gfortran gcc-c++ cmake \
+cd /opt
+#compiling OpenSSL
+curl -OL https://www.openssl.org/source/openssl-3.0.5.tar.gz
+tar zxvf openssl-3.0.5.tar.gz
+cd openssl-3.0.5
+./Configure
+make
+make install
+cd ..
+#Compiling CMake
+curl -OL https://github.com/Kitware/CMake/releases/download/v3.24.2/cmake-3.24.2.tar.gz
+tar zxvf cmake-3.24.2.tar.gz
+cd cmake-3.24.2
+./bootstrap && make && make install
+cd ..
+#compiling Ambertool22 and Amber20 cpu serial
+tar jxvf ./AmberTools22.tar.bz2
+mv amber22_src amber20_src
+tar jxvf ./Amber20.tar.bz2
+sed -i -e "s/amber22_src/amber20_src/" amber20_src/build/run_cmake
+cd amber20_src/build/
+./run_cmake
+make install 
+#compiling Ambertool22 and Amber20 gpu serial
+sed -i -e "s/CUDA=FALSE/CUDA=TRUE/" run_cmake
+./run_cmake
+make install
+
+%environment
+
+export CUDA_HOME=/usr/local/cuda/
+export PATH=/opt/cmake-3.24.2/bin/cmake:$PATH
+export OPENSSL_ROOT_DIR=/opt/openssl-3.0.5/
+export AMBERHOME=/opt/amber22/
+export PATH="$AMBERHOME/bin:$PATH"
+export LD_LIBRARY_PATH="$AMBERHOME/lib:$LD_LIBRARY_PATH"
+export PYTHONPATH="$AMBERHOME/lib/python3.9/site-packages:$PYTHONPATH"
