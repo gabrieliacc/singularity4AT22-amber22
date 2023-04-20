@@ -1,4 +1,4 @@
-Definition file (.def) for creating a singularity image file containing the amber20 and AmberTools22 compiled in its serial version.
+Definition file (.def) for creating a singularity image file containing the amber20 and AmberTools22 compiled in its serial version and cuda.
 
 Creating the singularity image file (.sif):
 
