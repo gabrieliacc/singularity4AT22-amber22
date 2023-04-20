@@ -3,8 +3,8 @@ From: nvidia/cuda:11.7.0-devel-rockylinux8
 Stage: compile
 
 %files
-./Amber20.tar.bz2 /opt
-./AmberTools22.tar.bz2 /opt
+../Amber22.tar.bz2 /opt
+../AmberTools22.tar.bz2 /opt
 
 %post 
 dnf -y install tcsh make \
@@ -32,10 +32,8 @@ cd cmake-3.24.2
 cd ..
 #compiling Ambertool22 and Amber20 cpu serial
 tar jxvf ./AmberTools22.tar.bz2
-mv amber22_src amber20_src
-tar jxvf ./Amber20.tar.bz2
-sed -i -e "s/amber22_src/amber20_src/" amber20_src/build/run_cmake
-cd amber20_src/build/
+tar jxvf ./Amber22.tar.bz2
+cd amber22_src/build/
 ./run_cmake
 make install 
 #compiling Ambertool22 and Amber20 gpu serial
